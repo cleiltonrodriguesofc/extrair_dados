@@ -1,60 +1,179 @@
 
-# Public Payroll Data Extraction Pipeline
+# 📄 Payroll Data Extraction & Processing Pipeline
 
-## 📋 Overview
+This project automates the extraction, cleaning, and structuring of payroll data originally stored in PDF documents.
+It converts raw payroll PDFs into a clean, standardized Excel spreadsheet with key fields such as **Registration Number**, **Name**, **Position**, **CPF**, **Admission Date**, and **Admission Type**.
 
-This project implements an automated **ETL pipeline** designed to process semi-structured public sector payroll data. It converts legacy PDF reports into clean, analytical Excel datasets, facilitating financial auditing and resource management.
+The pipeline was designed to support:
 
-The system utilizes **Python** to extract raw text, sanitize encoding artifacts (fixing UTF-8 issues), parse hierarchical employee records, and export structured data for analysis.
+* financial impact assessments
+* HR audits and compliance
+* public-sector payroll analytics
+* modeling and decision-support workflows
+* structured data generation from unstructured documents
 
-## 🚀 Key Features
+---
 
-  * **PDF Text Extraction:** leverages `PyMuPDF` (Fitz) to scrape high-fidelity text data from PDF documents.
-  * **Data Sanitization:** Automatically cleans character encoding errors (e.g., correcting `MatrÃ­cula` to `Matricula`) and strips irrelevant headers/footers to prepare data for parsing.
-  * **Structured Parsing:** Uses positional logic to identify and associate multi-line employee records, extracting fields such as **Name**, **Role (Cargo)**, **CPF**, and **Admission Date**.
-  * **Excel Export:** Transforms parsed data into a `pandas` DataFrame and exports a formatted `.xlsx` file using `openpyxl`.
+## 🚀 Features
 
-## 🛠️ Tech Stack
+✔ Extracts text from payroll PDFs
+✔ Cleans and normalizes broken encodings and system lines
+✔ Removes headers, footers, and non-relevant metadata
+✔ Structures employee records automatically
+✔ Converts the final dataset into Excel (`.xlsx`)
+✔ End-to-end automated workflow in Python
 
-  * **Language:** Python 3.x
-  * **Libraries:**
-      * `pandas` (Data manipulation)
-      * `pymupdf` (PDF processing)
-      * `openpyxl` (Excel I/O)
-      * `re` (Regular Expressions)
+---
 
-## 📂 Project Structure
+## 🧩 Project Structure
 
-The pipeline is divided into four modular scripts to ensure separation of concerns:
+### **1. `#1create_txt.py` – PDF Text Extraction**
 
-| Script | Description |
-| :--- | :--- |
-| **`1-create_txt.py`** | **Extract:** Reads the source PDF and dumps raw content into a text file. |
-| **`2-treat-data.py`** | **Transform (Stage 1):** Cleans the raw text, fixing specific UTF-8 encoding issues and removing pagination noise. |
-| **`3-create-table.py`** | **Transform (Stage 2):** Parses the cleaned text stream to identify worker entities and map attributes (Matricula, CPF, etc.). |
-| **`4-create_excel.py`** | **Load:** Compiles the structured data into a Pandas DataFrame and saves it as `output.xlsx`. |
+Extracts full text from the payroll PDF using **PyMuPDF (fitz)** and outputs a raw `.txt` file.
 
-## ⚙️ Installation & Usage
+### **2. `#2treat-data.py` – Cleaning & Normalization**
 
-1.  **Clone the repository:**
+Cleans the extracted text by:
 
-    ```bash
-    git clone https://github.com/yourusername/payroll-etl-pipeline.git
-    ```
+* removing system-generated lines (headers, timestamps, resource codes, etc.)
+* fixing broken characters (e.g., `MatrÃ­cula` → `Matricula`)
+* standardizing field names
+* removing suffixes such as `| 082020 | 700 | EN`
 
-2.  **Install dependencies:**
+### **3. `#3create-table.py` – Structured Record Builder**
 
-    ```bash
-    pip install pandas openpyxl pymupdf
-    ```
+Parses the cleaned text and organizes each employee’s data into a structured block containing:
 
-3.  **Run the Pipeline:**
-    Execute the scripts in sequential order to process the file:
+* Registration Number
+* Name
+* Position
+* CPF
+* Admission Date
+* Admission Type
 
-    ```bash
-    python 1-create_txt.py
-    python 2-treat-data.py
-    python 3-create-table.py
-    python 4-create_excel.py
-    ```
+### **4. `#4create_excel.py` – Excel Generator**
+
+Reads all structured records and exports them into a clean **Excel spreadsheet** using pandas and openpyxl.
+
+---
+
+## 🔁 Processing Pipeline
+
+### **Step 1: PDF → Raw Text**
+
+A `.txt` file is generated containing all text extracted from the PDF.
+
+### **Step 2: Raw Text → Cleaned Text**
+
+Unnecessary lines are removed, encodings are fixed, and fields are standardized.
+
+### **Step 3: Cleaned Text → Structured Records**
+
+The script detects each employee entry and organizes it into a consistent “key: value” format, for example:
+
+```
+Matricula: 0105994.05
+Name: EMPLOYEE NAME
+Cargo: AGENTE ADMINISTRATIVO
+CPF: 027.773.893-81
+Admissao: 14/01/2011
+Forma de Admissao: EFETIVO
+```
+
+### **Step 4: Structured Records → Excel**
+
+The data is converted into a spreadsheet suitable for analysis.
+
+---
+
+## 🛠 Requirements
+
+* Python **3.8+**
+* Libraries:
+
+  * `pymupdf` (fitz)
+  * `pandas`
+  * `openpyxl`
+
+Install dependencies:
+
+```bash
+pip install pymupdf pandas openpyxl
+```
+
+---
+
+## ▶️ How to Run
+
+### **1. Extract text from PDF**
+
+Edit the paths in `#1create_txt.py`:
+
+```python
+pdf_path = "path/to/your_file.pdf"
+output_file_path = "1-ass-social.txt"
+```
+
+Run:
+
+```bash
+python #1create_txt.py
+```
+
+---
+
+### **2. Clean the text**
+
+```bash
+python #2treat-data.py
+```
+
+This updates the `.txt` file with cleaned and normalized content.
+
+---
+
+### **3. Build structured employee records**
+
+```bash
+python #3create-table.py
+```
+
+---
+
+### **4. Generate the Excel spreadsheet**
+
+Edit the output path in `#4create_excel.py` if needed:
+
+```python
+output_file_path = "payroll_employees.xlsx"
+```
+
+Run:
+
+```bash
+python #4create_excel.py
+```
+
+---
+
+## 📈 Future Improvements
+
+* Support for multiple PDFs in batch
+* Detection of additional payroll fields
+* Automatic validation and error checking
+* Dashboard integration (Power BI, Streamlit, etc.)
+* Merge datasets from different periods
+
+---
+
+## 🎯 Purpose
+
+This project transforms unstructured payroll documents into clean, analysis-ready datasets using automation and Python.
+It demonstrates practical experience in:
+
+* text processing and PDF extraction
+* data cleaning and normalization
+* data structuring and parsing logic
+* automation for finance and HR workflows
+* dataset preparation for financial modeling
 
