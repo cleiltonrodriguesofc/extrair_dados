@@ -1,18 +1,5 @@
 '''Import especific lines from a file'''
-'''
-AGENTE ADMINISTRATIVO | 082020 | 700 | EN
-Matrícula
-CPF
-Admissão
-Forma de Admissão
-Turno
-Situação
-0105994.05
-027.773.893-81
-14/01/2011
-EFETIVO
-40 Horas Semanais
-ATIVO'''
+
 
 # create a function to extract text from a file and create a new text file
 def extract_text_from_file(file_path: str, output_file_path: str) -> None:
