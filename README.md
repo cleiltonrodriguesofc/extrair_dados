@@ -72,11 +72,11 @@ Unnecessary lines are removed, encodings are fixed, and fields are standardized.
 The script detects each employee entry and organizes it into a consistent “key: value” format, for example:
 
 ```
-Matricula: 0105994.05
+Matricula: 00000-00
 Name: EMPLOYEE NAME
 Cargo: AGENTE ADMINISTRATIVO
-CPF: 027.773.893-81
-Admissao: 14/01/2011
+CPF: 000.000.000-00
+Admissao: 01/01/2000
 Forma de Admissao: EFETIVO
 ```
 
