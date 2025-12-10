@@ -1,61 +1,60 @@
-# Payroll Data Extraction and Processing Pipeline
 
-This project automates the extraction, cleaning, and structuring of payroll data originally stored in PDF documents.  
-The system converts raw payroll PDFs into a clean, standardized Excel spreadsheet containing fields such as **Registration Number**, **Name**, **Position**, **CPF**, **Admission Date**, and **Admission Type**.
+# Public Payroll Data Extraction Pipeline
 
-It was created for analytical use cases such as:
+## 📋 Overview
 
-- financial impact assessments;
-- HR audits;
-- payroll consolidation;
-- public-sector financial analysis;
-- modeling and decision-support workflows.
+This project implements an automated **ETL pipeline** designed to process semi-structured public sector payroll data. It converts legacy PDF reports into clean, analytical Excel datasets, facilitating financial auditing and resource management.
 
----
+The system utilizes **Python** to extract raw text, sanitize encoding artifacts (fixing UTF-8 issues), parse hierarchical employee records, and export structured data for analysis.
+
+## 🚀 Key Features
+
+  * **PDF Text Extraction:** leverages `PyMuPDF` (Fitz) to scrape high-fidelity text data from PDF documents.
+  * **Data Sanitization:** Automatically cleans character encoding errors (e.g., correcting `MatrÃ­cula` to `Matricula`) and strips irrelevant headers/footers to prepare data for parsing.
+  * **Structured Parsing:** Uses positional logic to identify and associate multi-line employee records, extracting fields such as **Name**, **Role (Cargo)**, **CPF**, and **Admission Date**.
+  * **Excel Export:** Transforms parsed data into a `pandas` DataFrame and exports a formatted `.xlsx` file using `openpyxl`.
+
+## 🛠️ Tech Stack
+
+  * **Language:** Python 3.x
+  * **Libraries:**
+      * `pandas` (Data manipulation)
+      * `pymupdf` (PDF processing)
+      * `openpyxl` (Excel I/O)
+      * `re` (Regular Expressions)
 
 ## 📂 Project Structure
 
-### `#1create_txt.py`
-Extracts all text from a payroll PDF using **PyMuPDF (fitz)** and saves it into a raw `.txt` file.  
-:contentReference[oaicite:0]{index=0}
+The pipeline is divided into four modular scripts to ensure separation of concerns:
 
-### `#2treat-data.py`
-Cleans and normalizes the text file by removing headers/footers, system metadata, and fixing encoding issues (broken accents, inconsistent field names, etc.).  
-Also removes suffixes like `| 082020 | 700 | EN` commonly attached to job titles.  
-:contentReference[oaicite:1]{index=1}
+| Script | Description |
+| :--- | :--- |
+| **`1-create_txt.py`** | **Extract:** Reads the source PDF and dumps raw content into a text file. |
+| **`2-treat-data.py`** | **Transform (Stage 1):** Cleans the raw text, fixing specific UTF-8 encoding issues and removing pagination noise. |
+| **`3-create-table.py`** | **Transform (Stage 2):** Parses the cleaned text stream to identify worker entities and map attributes (Matricula, CPF, etc.). |
+| **`4-create_excel.py`** | **Load:** Compiles the structured data into a Pandas DataFrame and saves it as `output.xlsx`. |
 
-### `#3create-table.py`
-Parses the cleaned text and extracts structured information for each employee, identifying and grouping fields such as Registration Number, Name, Position, CPF, Admission Date, and Admission Type.  
-Output is a structured `.txt` with consistent “key: value” formatting.  
-:contentReference[oaicite:2]{index=2}
+## ⚙️ Installation & Usage
 
-### `#4create_excel.py`
-Reads the structured `.txt` file and converts it into an Excel spreadsheet using **pandas** + **openpyxl**, generating a clean table ready for financial or HR analysis.  
-:contentReference[oaicite:3]{index=3}
+1.  **Clone the repository:**
 
----
+    ```bash
+    git clone https://github.com/yourusername/payroll-etl-pipeline.git
+    ```
 
-## 🔁 Processing Pipeline
+2.  **Install dependencies:**
 
-### 1. **PDF → Raw Text**
-- Extracts full text from the payroll PDF.
-- Produces an intermediate file such as `1-ass-social.txt`.  
-:contentReference[oaicite:4]{index=4}
+    ```bash
+    pip install pandas openpyxl pymupdf
+    ```
 
-### 2. **Raw Text → Cleaned Text**
-- Removes irrelevant lines (headers, timestamps, resource codes, logged user data).  
-- Fixes encoding errors (`MatrÃ­cula` → `Matricula`, `AdmissÃ£o` → `Admissao`, etc.).  
-- Removes suffixes and standardizes field names.  
-:contentReference[oaicite:5]{index=5}
+3.  **Run the Pipeline:**
+    Execute the scripts in sequential order to process the file:
 
-### 3. **Cleaned Text → Structured Employee Records**
-- Searches for the `Matricula` keyword to identify employee blocks.
-- Collects related fields using positional rules.  
-- Produces structured lines such as:  
-```text
-Matricula: 0105994.05
-Name: EMPLOYEE NAME
-Cargo: AGENTE ADMINISTRATIVO
-CPF: 027.773.893-81
-Admissao: 14/01/2011
-Forma de Admissao: EFETIVO
+    ```bash
+    python 1-create_txt.py
+    python 2-treat-data.py
+    python 3-create-table.py
+    python 4-create_excel.py
+    ```
+
